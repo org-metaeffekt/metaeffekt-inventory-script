@@ -31,8 +31,7 @@ echo "Executing rhel-extractor.sh"
 mkdir -p $METAEFFEKT_INV_BASEDIR/package-meta
 
 # generate a json file containing all packages currently installed
-rpm -qa --qf '\{"name":%{NAME},"version":%{VERSION},"license":%{LICENSE}\}\n' > $METAEFFEKT_INV_BASEDIR/inventory-full.json
-
+rpm -qa --qf '\{"name":"%{NAME}","version":"%{VERSION}","license":"%{LICENSE}"\}\n' | sort > $METAEFFEKT_INV_BASEDIR/inventory-full.json
 
 
 ## examine distributions metadata
