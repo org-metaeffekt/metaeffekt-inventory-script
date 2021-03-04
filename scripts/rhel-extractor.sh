@@ -27,7 +27,7 @@ METAEFFEKT_INV_WDIR="/var/tmp/inventory"
 echo "Executing rhel-extractor.sh"
 
 # create folder structure in analysis folder (assuming sufficient permissions)
-mkdir -p /analysis/package-meta
+mkdir -p $METAEFFEKT_INV_WDIR/package-meta
 
 # examine distributions metadata
 uname -a > $METAEFFEKT_INV_WDIR/uname.txt
