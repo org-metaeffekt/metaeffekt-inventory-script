@@ -22,6 +22,7 @@ set -e
 
 # define the directory to store files in
 # this used to be /analysis once.
+# shall not contain spaces
 METAEFFEKT_INV_WDIR="/var/tmp/inventory"
 
 echo "Executing rhel-extractor.sh"
@@ -32,7 +33,7 @@ mkdir -p $METAEFFEKT_INV_WDIR/package-meta
 # examine distributions metadata
 uname -a > $METAEFFEKT_INV_WDIR/uname.txt
 cat /etc/issue > $METAEFFEKT_INV_WDIR/issue.txt
-cat /etc/rhel-release > $METAEFFEKT_INV_WDIR/release.txt
+cat /etc/redhat-release > $METAEFFEKT_INV_WDIR/release.txt
 
 # list packages
 rpm -qa --qf '| %{NAME} | %{VERSION} | %{LICENSE} |\n' | sort > $METAEFFEKT_INV_WDIR/packages_rpm.txt
@@ -41,7 +42,7 @@ rpm -qa --qf '| %{NAME} | %{VERSION} | %{LICENSE} |\n' | sort > $METAEFFEKT_INV_
 rpm -qa --qf '%{NAME}\n' | sort > $METAEFFEKT_INV_WDIR/packages_rpm-name-only.txt
 
 # query package metadata and covered files
-packagenames=`cat $METAEFFEKT_INV_WDIR/packages_rpm-name-only.txt`
+packagenames="$(cat $METAEFFEKT_INV_WDIR/packages_rpm-name-only.txt)"
 for package in $packagenames
 do
   rpm -qi $package > $METAEFFEKT_INV_WDIR/package-meta/${package}_rpm.txt
@@ -51,4 +52,4 @@ done
 command -v docker && docker images > $METAEFFEKT_INV_WDIR/docker-images.txt || true
 
 # adapt ownership of extracted files to match folder creator user and group
-chown "stat -c '%u' $METAEFFEKT_INV_WDIR":"stat -c '%g' $METAEFFEKT_INV_WDIR" -R $METAEFFEKT_INV_WDIR
+chown "$(stat -c '%u' $METAEFFEKT_INV_WDIR)":"$(stat -c '%g' $METAEFFEKT_INV_WDIR)" -R $METAEFFEKT_INV_WDIR
