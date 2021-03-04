@@ -23,33 +23,38 @@ set -e
 # define the directory to store files in
 # this used to be /analysis once.
 # shall not contain spaces
-METAEFFEKT_INV_WDIR="/var/tmp/inventory"
+METAEFFEKT_INV_BASEDIR="/var/tmp/inventory"
 
 echo "Executing rhel-extractor.sh"
 
 # create folder structure in analysis folder (assuming sufficient permissions)
-mkdir -p $METAEFFEKT_INV_WDIR/package-meta
+mkdir -p $METAEFFEKT_INV_BASEDIR/package-meta
 
-# examine distributions metadata
-uname -a > $METAEFFEKT_INV_WDIR/uname.txt
-cat /etc/issue > $METAEFFEKT_INV_WDIR/issue.txt
-cat /etc/redhat-release > $METAEFFEKT_INV_WDIR/release.txt
+# generate a json file containing all packages currently installed
+rpm -qa --qf '\{"name":%{NAME},"version":%{VERSION},"license":%{LICENSE}\}\n' > $METAEFFEKT_INV_BASEDIR/inventory-full.json
 
-# list packages
-rpm -qa --qf '| %{NAME} | %{VERSION} | %{LICENSE} |\n' | sort > $METAEFFEKT_INV_WDIR/packages_rpm.txt
 
-# list packages names (no version included)
-rpm -qa --qf '%{NAME}\n' | sort > $METAEFFEKT_INV_WDIR/packages_rpm-name-only.txt
 
-# query package metadata and covered files
-packagenames="$(cat $METAEFFEKT_INV_WDIR/packages_rpm-name-only.txt)"
-for package in $packagenames
-do
-  rpm -qi $package > $METAEFFEKT_INV_WDIR/package-meta/${package}_rpm.txt
-done
+## examine distributions metadata
+#uname -a > $METAEFFEKT_INV_BASEDIR/uname.txt
+#cat /etc/issue > $METAEFFEKT_INV_BASEDIR/issue.txt
+#cat /etc/redhat-release > $METAEFFEKT_INV_BASEDIR/release.txt
 
-# if docker is installed dump the image list
-command -v docker && docker images > $METAEFFEKT_INV_WDIR/docker-images.txt || true
+## list packages
+#rpm -qa --qf '| %{NAME} | %{VERSION} | %{LICENSE} |\n' | sort > $METAEFFEKT_INV_BASEDIR/packages_rpm.txt
 
-# adapt ownership of extracted files to match folder creator user and group
-chown "$(stat -c '%u' $METAEFFEKT_INV_WDIR)":"$(stat -c '%g' $METAEFFEKT_INV_WDIR)" -R $METAEFFEKT_INV_WDIR
+## list packages names (no version included)
+#rpm -qa --qf '%{NAME}\n' | sort > $METAEFFEKT_INV_BASEDIR/packages_rpm-name-only.txt
+
+## query package metadata and covered files
+#packagenames="$(cat $METAEFFEKT_INV_BASEDIR/packages_rpm-name-only.txt)"
+#for package in $packagenames
+#do
+#  rpm -qi $package > $METAEFFEKT_INV_BASEDIR/package-meta/${package}_rpm.txt
+#done
+
+## if docker is installed dump the image list
+#command -v docker && docker images > $METAEFFEKT_INV_BASEDIR/docker-images.txt || true
+
+## adapt ownership of extracted files to match folder creator user and group
+#chown "$(stat -c '%u' $METAEFFEKT_INV_BASEDIR)":"$(stat -c '%g' $METAEFFEKT_INV_BASEDIR)" -R $METAEFFEKT_INV_BASEDIR
