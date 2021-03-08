@@ -1,0 +1,3 @@
+#!/bin/sh
+
+/bin/sh /opt/metaeffekt/inventory/rhel-extractor.sh --full

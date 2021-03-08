@@ -20,18 +20,59 @@
 # rather fail earlier than later
 set -e
 
-# define the directory to store files in
+# -- functions, variables --
+
+# the directory to store files in, both temporary and output files.
 # this used to be /analysis once.
-# shall not contain spaces
+# TODO: rename variable: all caps variables are not recommended.
 METAEFFEKT_INV_BASEDIR="/var/tmp/inventory"
 
-echo "Executing rhel-extractor.sh"
+#function usage() {
+#  echo "usage: /bin/sh $0 (--full|--update)"
+#}
+
+# check the input flag
+if [ "$1" != "--update" ] && [ "$1" != "--full" ]; then
+    echo "Invalid flag."
+    exit 1
+fi
+
+
+echo "Executing $0"
 
 # create folder structure in analysis folder (assuming sufficient permissions)
-mkdir -p $METAEFFEKT_INV_BASEDIR/package-meta
+mkdir -p "$METAEFFEKT_INV_BASEDIR"
+
+# if script runs a new full check, generate a new uuid
+if [ "$1" == "--full" ]; then
+    rm -f "$METAEFFEKT_INV_BASEDIR/monthly-uuid"
+    uuidgen > "$METAEFFEKT_INV_BASEDIR/monthly-uuid"
+    # create a way to store
+fi
+
+# -- query relevant data --
 
 # generate a json file containing all packages currently installed
-rpm -qa --qf '\{"name":"%{NAME}","version":"%{VERSION}","license":"%{LICENSE}"\}\n' | sort > $METAEFFEKT_INV_BASEDIR/inventory-full.json
+rpm -qa --qf '\{"name":"%{NAME}","version":"%{VERSION}","license":"%{LICENSE}"\}\n' | sort > "$METAEFFEKT_INV_BASEDIR/inventory-full.tmp.json"
+
+
+# -- prepare data for filebeat --
+
+# if we're doing a new full check, just copy the file. else run difference, then overwrite full file with the current status.
+if [ "$1" == "--full" ]; then
+    mv -f "$METAEFFEKT_INV_BASEDIR/inventory-full.tmp.json" "$METAEFFEKT_INV_BASEDIR/inventory-full.json"
+
+    # push relevant info to filebeat's file
+
+elif [ "$1" == "--update" ]; then
+    comm -13 "$METAEFFEKT_INV_BASEDIR/inventory-full.json" "$METAEFFEKT_INV_BASEDIR/inventory-full.tmp.json" > "$METAEFFEKT_INV_BASEDIR/inventory-update.json"
+    mv "$METAEFFEKT_INV_BASEDIR/inventory-full.tmp.json" "$METAEFFEKT_INV_BASEDIR/inventory-full.json"
+
+fi
+
+
+
+
 
 
 ## examine distributions metadata
