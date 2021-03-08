@@ -20,81 +20,66 @@
 # rather fail earlier than later
 set -e
 
-# -- functions, variables --
+# -- variables --
 
-# the directory to store files in, both temporary and output files.
-# this used to be /analysis once.
-# TODO: rename variable: all caps variables are not recommended.
-METAEFFEKT_INV_BASEDIR="/var/tmp/inventory"
+# the directory to store files in, both temporary and output files
+Metaeffekt_Inv_Basedir="/var/tmp/inventory"
 
-#function usage() {
-#  echo "usage: /bin/sh $0 (--full|--update)"
-#}
+# TODO: get some sort of machine ID
 
-# check the input flag
-if [ "$1" != "--update" ] && [ "$1" != "--full" ]; then
-    echo "Invalid flag."
-    exit 1
-fi
+# get current uuid
+correlationuuid="$(cat $Metaeffekt_Inv_Basedir/correlation-uuid)"
 
+
+# -- functions --
+
+
+# -- basic script stuff, check input etc
 
 echo "Executing $0"
 
+# check the input flag
+if [ "$1" != "--update" ] && [ "$1" != "--full" ]; then
+    echo "$0: Invalid flag."
+    exit 1
+fi
+
 # create folder structure in analysis folder (assuming sufficient permissions)
-mkdir -p "$METAEFFEKT_INV_BASEDIR"
+mkdir -p "$Metaeffekt_Inv_Basedir"
 
 # if script runs a new full check, generate a new uuid
 if [ "$1" == "--full" ]; then
-    rm -f "$METAEFFEKT_INV_BASEDIR/monthly-uuid"
-    uuidgen > "$METAEFFEKT_INV_BASEDIR/monthly-uuid"
-    # create a way to store
+  # store new uuid per last full run
+  rm -f "$Metaeffekt_Inv_Basedir/correlation-uuid"
+  uuidgen > "$Metaeffekt_Inv_Basedir/corellation-uuid"
+  # update corellationuuid variable
+  correlationuuid="$(cat $Metaeffekt_Inv_Basedir/correlation-uuid)"
 fi
 
-# -- query relevant data --
+# crash if running in update mode but uuid has never been generated
+if [ "$1" == "--update" ] && [ ! -f "$Metaeffekt_Inv_Basedir/correlation-uuid" ]; then
+  echo "UUID file missing. Has full ever been run?"
+  exit 1
+fi
+
+# -- collect relevant data --
 
 # generate a json file containing all packages currently installed
-rpm -qa --qf '\{"name":"%{NAME}","version":"%{VERSION}","license":"%{LICENSE}"\}\n' | sort > "$METAEFFEKT_INV_BASEDIR/inventory-full.tmp.json"
+rpm -qa --qf '\{"name":"%{NAME}","version":"%{VERSION}","license":"%{LICENSE}"\}\n' | sort > "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
 
 
-# -- prepare data for filebeat --
+# -- process data for filebeat --
 
-# if we're doing a new full check, just copy the file. else run difference, then overwrite full file with the current status.
+# if we're doing a new full check, just copy the file. else run difference, then overwrite full file with the current status
 if [ "$1" == "--full" ]; then
-    mv -f "$METAEFFEKT_INV_BASEDIR/inventory-full.tmp.json" "$METAEFFEKT_INV_BASEDIR/inventory-full.json"
+  mv -f "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json" "$Metaeffekt_Inv_Basedir/inventory-full.json"
 
-    # push relevant info to filebeat's file
 
 elif [ "$1" == "--update" ]; then
-    comm -13 "$METAEFFEKT_INV_BASEDIR/inventory-full.json" "$METAEFFEKT_INV_BASEDIR/inventory-full.tmp.json" > "$METAEFFEKT_INV_BASEDIR/inventory-update.json"
-    mv "$METAEFFEKT_INV_BASEDIR/inventory-full.tmp.json" "$METAEFFEKT_INV_BASEDIR/inventory-full.json"
-
+  comm -13 "$Metaeffekt_Inv_Basedir/inventory-full.json" "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json" > "$Metaeffekt_Inv_Basedir/inventory-update.json"
+  mv "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json" "$Metaeffekt_Inv_Basedir/inventory-full.json"
 fi
 
 
-
-
-
-
-## examine distributions metadata
-#uname -a > $METAEFFEKT_INV_BASEDIR/uname.txt
-#cat /etc/issue > $METAEFFEKT_INV_BASEDIR/issue.txt
-#cat /etc/redhat-release > $METAEFFEKT_INV_BASEDIR/release.txt
-
-## list packages
-#rpm -qa --qf '| %{NAME} | %{VERSION} | %{LICENSE} |\n' | sort > $METAEFFEKT_INV_BASEDIR/packages_rpm.txt
-
-## list packages names (no version included)
-#rpm -qa --qf '%{NAME}\n' | sort > $METAEFFEKT_INV_BASEDIR/packages_rpm-name-only.txt
-
-## query package metadata and covered files
-#packagenames="$(cat $METAEFFEKT_INV_BASEDIR/packages_rpm-name-only.txt)"
-#for package in $packagenames
-#do
-#  rpm -qi $package > $METAEFFEKT_INV_BASEDIR/package-meta/${package}_rpm.txt
-#done
-
-## if docker is installed dump the image list
-#command -v docker && docker images > $METAEFFEKT_INV_BASEDIR/docker-images.txt || true
-
-## adapt ownership of extracted files to match folder creator user and group
-#chown "$(stat -c '%u' $METAEFFEKT_INV_BASEDIR)":"$(stat -c '%g' $METAEFFEKT_INV_BASEDIR)" -R $METAEFFEKT_INV_BASEDIR
+# -- delete leftover files --
+rm -f "$Metaeffekt_Inv_Basedir/inventory-update.json"
