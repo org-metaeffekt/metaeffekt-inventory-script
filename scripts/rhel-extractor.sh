@@ -25,11 +25,11 @@ set -e
 # the directory to store files in, both temporary and output files
 Metaeffekt_Inv_Basedir="/var/tmp/inventory"
 
-# TODO: get some sort of machine ID
+# get an application specific machine id as per machine-id man page
+# keyed sha256 function with the machine id generates our id
+machineidhash=$(cat /etc/machine-id | (echo -n "inventory-script" && cat - && echo -n "machine-id-gen-61a54fdadaaae669") | sha256sum | cut -b 1-64)
 
-# get current uuid
-correlationuuid="$(cat $Metaeffekt_Inv_Basedir/correlation-uuid)"
-
+correlationuuid="NONE"
 
 # -- functions --
 
@@ -47,20 +47,22 @@ fi
 # create folder structure in analysis folder (assuming sufficient permissions)
 mkdir -p "$Metaeffekt_Inv_Basedir"
 
+# TODO: move uuid correlationuuid handling to the processing below, it doesn't need to be separate.
+
 # if script runs a new full check, generate a new uuid
 if [ "$1" == "--full" ]; then
   # store new uuid per last full run
   rm -f "$Metaeffekt_Inv_Basedir/correlation-uuid"
-  uuidgen > "$Metaeffekt_Inv_Basedir/corellation-uuid"
+  uuidgen > "$Metaeffekt_Inv_Basedir/correlation-uuid"
   # update corellationuuid variable
-  correlationuuid="$(cat $Metaeffekt_Inv_Basedir/correlation-uuid)"
-fi
-
-# crash if running in update mode but uuid has never been generated
-if [ "$1" == "--update" ] && [ ! -f "$Metaeffekt_Inv_Basedir/correlation-uuid" ]; then
+  correlationuuid="$(cat "$Metaeffekt_Inv_Basedir/correlation-uuid")"
+elif [ ! -f "$Metaeffekt_Inv_Basedir/correlation-uuid" ]; then
   echo "UUID file missing. Has full ever been run?"
   exit 1
+else
+  correlationuuid=$(cat "$Metaeffekt_Inv_Basedir/correlation-uuid")
 fi
+
 
 # -- collect relevant data --
 
@@ -74,7 +76,11 @@ rpm -qa --qf '\{"name":"%{NAME}","version":"%{VERSION}","license":"%{LICENSE}"\}
 if [ "$1" == "--full" ]; then
   mv -f "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json" "$Metaeffekt_Inv_Basedir/inventory-full.json"
 
+  # get an iso timestamp of current run in UTC
+  timestamp=$(date -u --iso-8601=seconds)
 
+  # build host object
+  hostobj=$(printf '{"mtype":"host","machineidhash":"%s","correlationid":"%s","time":"%s"}' "$machineidhash" "$correlationuuid" "$timestamp" )
 elif [ "$1" == "--update" ]; then
   comm -13 "$Metaeffekt_Inv_Basedir/inventory-full.json" "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json" > "$Metaeffekt_Inv_Basedir/inventory-update.json"
   mv "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json" "$Metaeffekt_Inv_Basedir/inventory-full.json"
