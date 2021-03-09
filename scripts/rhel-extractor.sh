@@ -54,7 +54,7 @@ if [ "$1" == "--full" ]; then
   # store new uuid per last full run
   rm -f "$Metaeffekt_Inv_Basedir/correlation-uuid"
   uuidgen > "$Metaeffekt_Inv_Basedir/correlation-uuid"
-  # update corellationuuid variable
+  # update correlationuuid variable
   correlationuuid="$(cat "$Metaeffekt_Inv_Basedir/correlation-uuid")"
 elif [ ! -f "$Metaeffekt_Inv_Basedir/correlation-uuid" ]; then
   echo "UUID file missing. Has full ever been run?"
