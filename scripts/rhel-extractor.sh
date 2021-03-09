@@ -24,6 +24,7 @@ set -e
 
 # the directory to store files in, both temporary and output files
 Metaeffekt_Inv_Basedir="/var/tmp/inventory"
+Metaeffekt_Inv_Outfile="$Metaeffekt_Inv_Basedir/inventory-out.json"
 
 # get an application specific machine id as per machine-id man page
 # keyed sha256 function with the machine id generates our id
@@ -66,11 +67,12 @@ fi
 
 # -- collect relevant data --
 
-# generate a json file containing all packages currently installed
+# generate a json file containing all packages currently installed into a new temporary full state file
 rpm -qa --qf '\{"name":"%{NAME}","version":"%{VERSION}","license":"%{LICENSE}"\}\n' | sort > "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
 
 
 # -- process data for filebeat --
+
 
 # if we're doing a new full check, just copy the file. else run difference, then overwrite full file with the current status
 if [ "$1" == "--full" ]; then
@@ -81,11 +83,34 @@ if [ "$1" == "--full" ]; then
 
   # build host object
   hostobj=$(printf '{"mtype":"host","machineidhash":"%s","correlationid":"%s","time":"%s"}' "$machineidhash" "$correlationuuid" "$timestamp" )
+
+  # correlationid tag to be added to inventory messages (packages etc)
+  cortag=$(printf '"correlationid":"%s",' "$correlationuuid")
+
+  # send host object
+  printf "%s\n" "$hostobj" >> "$Metaeffekt_Inv_Outfile"
+
+  # send package list
+  packagetag=$(printf '"mtype":"package",%s' "$cortag")
+  sed "s/^{/{$packagetag/" $Metaeffekt_Inv_Basedir/inventory-full.json >> $Metaeffekt_Inv_Outfile
+
 elif [ "$1" == "--update" ]; then
+  # generate new list of packages that were added since the last run
+  touch "$Metaeffekt_Inv_Basedir/inventory-update.json"
   comm -13 "$Metaeffekt_Inv_Basedir/inventory-full.json" "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json" > "$Metaeffekt_Inv_Basedir/inventory-update.json"
+
+  # correlationid tag to be added to inventory messages (packages etc)
+  cortag=$(printf '"correlationid":"%s",' "$correlationuuid")
+
+  # send package list
+  packagetag=$(printf '"mtype":"package",%s' "$cortag")
+  sed "s/^{/{$packagetag/" "$Metaeffekt_Inv_Basedir/inventory-update.json" >> "$Metaeffekt_Inv_Outfile"
+
+  # after update was run, update the full state json.
   mv "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json" "$Metaeffekt_Inv_Basedir/inventory-full.json"
 fi
 
 
-# -- delete leftover files --
+# -- make sure that unneeded files are deleted --
+rm -f "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
 rm -f "$Metaeffekt_Inv_Basedir/inventory-update.json"
