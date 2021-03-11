@@ -70,7 +70,9 @@ fi
 # generate a json file containing all packages currently installed into a new temporary full state file
 #"":"%{}"
 #rpm -qa --qf '\{"name":"%{NAME}","version":"%{VERSION}","license":"%{LICENSE}"\}\n' | sort > "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
-rpm -qa --qf '\{"name":"%{NAME}","release":"%{RELEASE}","arch":"%{ARCH}","group":"%{GROUP}","license":"%{LICENSE}","sourcerpm":"%{SOURCERPM}","packager":"%{PACKAGER}","vendor":"%{VENDOR}","url":"%{URL}"\}\n' | sort > "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
+rpm -qa --qf '\{"name":"%{NAME}","version":"%{VERSION}","release":"%{RELEASE}","arch":"%{ARCH}","group":"%{GROUP}","license":"%{LICENSE}","sourcerpm":"%{SOURCERPM}","packager":"%{PACKAGER}","vendor":"%{VENDOR}","url":"%{URL}"\}\n' | sort > "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
+
+# more collection goes here, append to full tmp file
 
 # -- process data for filebeat --
 
