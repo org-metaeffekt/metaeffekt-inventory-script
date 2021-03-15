@@ -53,3 +53,6 @@ dkms.conf
 
 # Ignore IntelliJ IDEA folder
 .idea/
+
+# Ignore rpmbuild dir
+packaging-rpm/rpmbuild
