@@ -76,6 +76,11 @@ rpm -qa --qf '\{"name":"%{NAME}","version":"%{VERSION}","release":"%{RELEASE}","
 
 # -- process data for filebeat --
 
+# prepare json tags
+
+# correlationid tag to be added to inventory messages (packages etc)
+cortag=$(printf '"correlationid":"%s",' "$correlationuuid")
+packagetag=$(printf '"mtype":"package",%s' "$cortag")
 
 # if we're doing a new full check, just copy the file. else run difference, then overwrite full file with the current status
 if [ "$1" == "--full" ]; then
@@ -85,16 +90,12 @@ if [ "$1" == "--full" ]; then
   timestamp=$(date -u --iso-8601=seconds)
 
   # build host object
-  hostobj=$(printf '{"mtype":"host","machineidhash":"%s","correlationid":"%s","time":"%s"}' "$machineidhash" "$correlationuuid" "$timestamp" )
-
-  # correlationid tag to be added to inventory messages (packages etc)
-  cortag=$(printf '"correlationid":"%s",' "$correlationuuid")
+  hostobj=$(printf '{"mtype":"host","machineidhash":"%s",%s"time":"%s"}' "$machineidhash" "$cortag" "$timestamp" )
 
   # send host object
   printf "%s\n" "$hostobj" >> "$Metaeffekt_Inv_Outfile"
 
-  # send package list
-  packagetag=$(printf '"mtype":"package",%s' "$cortag")
+  # send full list
   sed "s/^{/{$packagetag/" $Metaeffekt_Inv_Basedir/inventory-full.json >> $Metaeffekt_Inv_Outfile
 
 elif [ "$1" == "--update" ]; then
@@ -102,11 +103,7 @@ elif [ "$1" == "--update" ]; then
   touch "$Metaeffekt_Inv_Basedir/inventory-update.json"
   comm -13 "$Metaeffekt_Inv_Basedir/inventory-full.json" "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json" > "$Metaeffekt_Inv_Basedir/inventory-update.json"
 
-  # correlationid tag to be added to inventory messages (packages etc)
-  cortag=$(printf '"correlationid":"%s",' "$correlationuuid")
-
   # send package list
-  packagetag=$(printf '"mtype":"package",%s' "$cortag")
   sed "s/^{/{$packagetag/" "$Metaeffekt_Inv_Basedir/inventory-update.json" >> "$Metaeffekt_Inv_Outfile"
 
   # after update was run, update the full state json.
