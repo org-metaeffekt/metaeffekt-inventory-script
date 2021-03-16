@@ -48,7 +48,6 @@ fi
 # create folder structure in analysis folder (assuming sufficient permissions)
 mkdir -p "$Metaeffekt_Inv_Basedir"
 
-# TODO: move uuid correlationuuid handling to the processing below, it doesn't need to be separate.
 
 # if script runs a new full check, generate a new uuid
 if [ "$1" == "--full" ]; then
@@ -65,22 +64,20 @@ else
 fi
 
 
-# -- collect relevant data --
-
-# generate a json file containing all packages currently installed into a new temporary full state file
-#"":"%{}"
-#rpm -qa --qf '\{"name":"%{NAME}","version":"%{VERSION}","license":"%{LICENSE}"\}\n' | sort > "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
-rpm -qa --qf '\{"name":"%{NAME}","version":"%{VERSION}","release":"%{RELEASE}","arch":"%{ARCH}","group":"%{GROUP}","license":"%{LICENSE}","sourcerpm":"%{SOURCERPM}","packager":"%{PACKAGER}","vendor":"%{VENDOR}","url":"%{URL}"\}\n' | sort > "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
-
-# more collection goes here, append to full tmp file
-
-# -- process data for filebeat --
-
 # prepare json tags
 
 # correlationid tag to be added to inventory messages (packages etc)
 cortag=$(printf '"correlationid":"%s",' "$correlationuuid")
 packagetag=$(printf '"mtype":"package",%s' "$cortag")
+
+# -- collect relevant data --
+
+# generate a json file containing all packages currently installed into a new temporary full state file
+rpm -qa --qf '\{"name":"%{NAME}","version":"%{VERSION}","release":"%{RELEASE}","arch":"%{ARCH}","group":"%{GROUP}","license":"%{LICENSE}","sourcerpm":"%{SOURCERPM}","packager":"%{PACKAGER}","vendor":"%{VENDOR}","url":"%{URL}"\}\n' | sort > "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
+
+# more collection goes here, append to full tmp file
+
+# -- process data for filebeat --
 
 # if we're doing a new full check, just copy the file. else run difference, then overwrite full file with the current status
 if [ "$1" == "--full" ]; then
