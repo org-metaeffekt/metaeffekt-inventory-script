@@ -73,7 +73,7 @@ packagetag=$(printf '"mtype":"package",%s' "$cortag")
 # -- collect relevant data --
 
 # generate a json file containing all packages currently installed into a new temporary full state file
-rpm -qa --qf '\{"name":"%{NAME}","version":"%{VERSION}","release":"%{RELEASE}","arch":"%{ARCH}","group":"%{GROUP}","license":"%{LICENSE}","sourcerpm":"%{SOURCERPM}","packager":"%{PACKAGER}","vendor":"%{VENDOR}","url":"%{URL}"\}\n' | sort > "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
+rpm -qa --qf "\{$packagetag" --qf '"name":"%{NAME}","version":"%{VERSION}","release":"%{RELEASE}","arch":"%{ARCH}","group":"%{GROUP}","license":"%{LICENSE}","sourcerpm":"%{SOURCERPM}","packager":"%{PACKAGER}","vendor":"%{VENDOR}","url":"%{URL}"\}\n' | sort > "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
 
 # more collection goes here, append to full tmp file
 
@@ -93,14 +93,14 @@ if [ "$1" == "--full" ]; then
   printf "%s\n" "$hostobj" >> "$Metaeffekt_Inv_Outfile"
 
   # send full list
-  sed "s/^{/{$packagetag/" $Metaeffekt_Inv_Basedir/inventory-full.json >> $Metaeffekt_Inv_Outfile
+  cat $Metaeffekt_Inv_Basedir/inventory-full.json >> $Metaeffekt_Inv_Outfile
 
 elif [ "$1" == "--update" ]; then
   # generate new list of packages that were added since the last run
   comm -13 "$Metaeffekt_Inv_Basedir/inventory-full.json" "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json" > "$Metaeffekt_Inv_Basedir/inventory-update.json"
 
   # send package list
-  sed "s/^{/{$packagetag/" "$Metaeffekt_Inv_Basedir/inventory-update.json" >> "$Metaeffekt_Inv_Outfile"
+  cat "$Metaeffekt_Inv_Basedir/inventory-update.json" >> "$Metaeffekt_Inv_Outfile"
 
   # after update was run, update the full state json.
   mv "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json" "$Metaeffekt_Inv_Basedir/inventory-full.json"
