@@ -100,7 +100,6 @@ if [ "$1" == "--full" ]; then
 
 elif [ "$1" == "--update" ]; then
   # generate new list of packages that were added since the last run
-  touch "$Metaeffekt_Inv_Basedir/inventory-update.json"
   comm -13 "$Metaeffekt_Inv_Basedir/inventory-full.json" "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json" > "$Metaeffekt_Inv_Basedir/inventory-update.json"
 
   # send package list
