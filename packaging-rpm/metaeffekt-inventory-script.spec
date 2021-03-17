@@ -7,11 +7,15 @@ License: ASL 2.0
 URL: https://github.com/org-metaeffekt/metaeffekt-inventory-script
 Source0: metaeffekt-inventory-script-src.tar.gz
 
+BuildRequires: bash
 BuildRequires: coreutils
+BuildRequires: git
 Requires: bash
 Requires: coreutils
 Requires: cronie
 Requires: cronie-anacron
+Requires: rpm
+Requires: sed
 Requires: util-linux
 
 BuildArch: noarch
