@@ -1,5 +1,5 @@
 Name: metaeffekt-inventory-script
-Version: %(git describe --tags)
+Version: %(git describe --tags | sed "s/-/+/;s/-/\./g")
 Release: 1%{?dist}
 Summary: Scripts for creating an inventory of software components on a machine.
 
@@ -10,6 +10,7 @@ Source0: metaeffekt-inventory-script-src.tar.gz
 BuildRequires: bash
 BuildRequires: coreutils
 BuildRequires: git
+BuildRequires: sed
 Requires: bash
 Requires: coreutils
 Requires: cronie
