@@ -37,6 +37,9 @@ mkdir -p %{buildroot}/etc/cron.daily
 install -m 755 scripts/cronfiles/metaeffekt-inventory-full %{buildroot}/etc/cron.monthly/metaeffekt-inventory-full
 install -m 755 scripts/cronfiles/metaeffekt-inventory-update %{buildroot}/etc/cron.daily/metaeffekt-inventory-update
 
+%post
+%{metaeffekt_installdir}/rhel-extractor.sh --full
+
 %files
 %license LICENSE
 %{metaeffekt_installdir}/rhel-extractor.sh
