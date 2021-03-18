@@ -70,12 +70,18 @@ fi
 cortag=$(printf '"correlationid":"%s",' "$correlationuuid")
 packagetag=$(printf '"mtype":"package",%s' "$cortag")
 
+dockertag=$(printf '"mtype":"image","container":"docker",%s' "$cortag")
+
 # -- collect relevant data --
 
 # generate a json file containing all packages currently installed into a new temporary full state file
-rpm -qa --qf "\{$packagetag" --qf '"name":"%{NAME}","version":"%{VERSION}","release":"%{RELEASE}","arch":"%{ARCH}","group":"%{GROUP}","license":"%{LICENSE}","sourcerpm":"%{SOURCERPM}","packager":"%{PACKAGER}","vendor":"%{VENDOR}","url":"%{URL}"\}\n' | sort > "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
+rpm -qa --qf "\{$packagetag" --qf '"name":"%{NAME}","version":"%{VERSION}","release":"%{RELEASE}","arch":"%{ARCH}","group":"%{GROUP}","license":"%{LICENSE}","sourcerpm":"%{SOURCERPM}","packager":"%{PACKAGER}","vendor":"%{VENDOR}","url":"%{URL}"\}\n' > "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
 
-# more collection goes here, append to full tmp file
+# if docker is installed, get data about docker images
+command -v docker &>/dev/null && docker images --format '{"repository":"{{.Repository}}","tag":"{{.Tag}}","imageid":"{{.ID}}","createdat":"{{.CreatedAt}}","size":"{{.Size}}"}' | sed "s/^{/{$dockertag/g" >> "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
+
+# sort everything
+sort -o "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json" "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
 
 # -- process data for filebeat --
 
