@@ -78,7 +78,7 @@ dockertag=$(printf '"mtype":"image","container":"docker",%s' "$cortag")
 rpm -qa --qf "\{$packagetag" --qf '"name":"%{NAME}","version":"%{VERSION}","release":"%{RELEASE}","arch":"%{ARCH}","group":"%{GROUP}","license":"%{LICENSE}","sourcerpm":"%{SOURCERPM}","packager":"%{PACKAGER}","vendor":"%{VENDOR}","url":"%{URL}"\}\n' > "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
 
 # if docker is installed, get data about docker images
-command -v docker &>/dev/null && docker images --format '{"repository":"{{.Repository}}","tag":"{{.Tag}}","imageid":"{{.ID}}","createdat":"{{.CreatedAt}}","size":"{{.Size}}"}' | sed "s/^{/{$dockertag/g" >> "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
+command -v docker &>/dev/null && docker images --all --no-trunc --format '{"repository":"{{.Repository}}","tag":"{{.Tag}}","imageid":"{{.ID}}","createdat":"{{.CreatedAt}}","size":"{{.Size}}"}' | sed "s/^{/{$dockertag/g" >> "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
 
 # sort everything
 sort -o "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json" "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
