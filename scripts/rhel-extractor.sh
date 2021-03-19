@@ -26,15 +26,6 @@ set -e
 Metaeffekt_Inv_Basedir="/var/tmp/inventory"
 Metaeffekt_Inv_Outfile="$Metaeffekt_Inv_Basedir/inventory-out.json"
 
-# get an application specific machine id as per machine-id man page
-# keyed sha256 function with the machine id generates our id
-machineidhash=$(cat /etc/machine-id | (echo -n "inventory-script" && cat - && echo -n "machine-id-gen-61a54fdadaaae669") | sha256sum | cut -b 1-64)
-
-correlationuuid="NONE"
-
-# -- functions --
-
-
 # -- basic script stuff, check input etc
 
 echo "Executing $0"
@@ -48,8 +39,10 @@ fi
 # create folder structure in analysis folder (assuming sufficient permissions)
 mkdir -p "$Metaeffekt_Inv_Basedir"
 
+# -- prepare json tags --
 
-# if script runs a new full check, generate a new uuid
+# decide when to use a new correlation id or use old one
+correlationuuid="NONE"
 if [ "$1" == "--full" ]; then
   # store new uuid per last full run
   rm -f "$Metaeffekt_Inv_Basedir/correlation-uuid"
@@ -62,9 +55,11 @@ elif [ ! -f "$Metaeffekt_Inv_Basedir/correlation-uuid" ]; then
 else
   correlationuuid=$(cat "$Metaeffekt_Inv_Basedir/correlation-uuid")
 fi
+# if correlation ID is still NONE by now, something went awfully wrong.
 
-
-# prepare json tags
+# get an application specific machine id as per machine-id man page
+# keyed sha256 function with the machine id generates our id
+machineidhash=$(cat /etc/machine-id | (echo -n "inventory-script" && cat - && echo -n "machine-id-gen-61a54fdadaaae669") | sha256sum | cut -b 1-64)
 
 # correlationid tag to be added to inventory messages (packages etc)
 cortag=$(printf '"correlationid":"%s"' "$correlationuuid")
