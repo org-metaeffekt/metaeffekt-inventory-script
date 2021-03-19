@@ -10,7 +10,9 @@ Source0: metaeffekt-inventory-script-src.tar.gz
 BuildRequires: bash
 BuildRequires: coreutils
 BuildRequires: git
+BuildRequires: gzip
 BuildRequires: sed
+BuildRequires: tar
 Requires: bash
 Requires: coreutils
 Requires: cronie
