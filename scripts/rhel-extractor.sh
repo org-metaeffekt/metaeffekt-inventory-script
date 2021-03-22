@@ -53,20 +53,20 @@ elif [ ! -f "$Metaeffekt_Inv_Basedir/correlation-uuid" ]; then
   echo "UUID file missing. Has full ever been run?"
   exit 1
 else
-  correlationuuid=$(cat "$Metaeffekt_Inv_Basedir/correlation-uuid")
+  correlationuuid="$(cat "$Metaeffekt_Inv_Basedir/correlation-uuid")"
 fi
 # if correlation ID is still NONE by now, something went awfully wrong.
 
 # get an application specific machine id as per machine-id man page
 # keyed sha256 function with the machine id generates our id
-machineidhash=$(cat /etc/machine-id | (echo -n "inventory-script" && cat - && echo -n "machine-id-gen-61a54fdadaaae669") | sha256sum | cut -b 1-64)
+machineidhash="$(cat /etc/machine-id | (echo -n "inventory-script" && cat - && echo -n "machine-id-gen-61a54fdadaaae669") | sha256sum | cut -b 1-64)"
 
 # correlationid tag to be added to inventory messages (packages etc)
-cortag=$(printf '"correlationid":"%s"' "$correlationuuid")
-packagetag=$(printf '"mtype":"package",%s' "$cortag")
-osinfotag=$(printf '"mtype":"osinfo",%s' "$cortag")
+cortag="$(printf '"correlationid":"%s"' "$correlationuuid")"
+packagetag="$(printf '"mtype":"package",%s' "$cortag")"
+osinfotag="$(printf '"mtype":"osinfo",%s' "$cortag")"
 
-dockertag=$(printf '"mtype":"image","container":"docker",%s' "$cortag")
+dockertag="$(printf '"mtype":"image","container":"docker",%s' "$cortag")"
 
 # -- collect relevant data --
 
@@ -102,16 +102,16 @@ if [ "$1" == "--full" ]; then
   mv -f "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json" "$Metaeffekt_Inv_Basedir/inventory-full.json"
 
   # get an iso timestamp of current run in UTC
-  timestamp=$(date -u --iso-8601=seconds)
+  timestamp="$(date -u --iso-8601=seconds)"
 
   # build host object
-  hostobj=$(printf '{"mtype":"host","machineidhash":"%s",%s,"time":"%s"}' "$machineidhash" "$cortag" "$timestamp" )
+  hostobj="$(printf '{"mtype":"host","machineidhash":"%s",%s,"time":"%s"}' "$machineidhash" "$cortag" "$timestamp")"
 
   # send host object
   printf "%s\n" "$hostobj" >> "$Metaeffekt_Inv_Outfile"
 
   # send full list
-  cat $Metaeffekt_Inv_Basedir/inventory-full.json >> $Metaeffekt_Inv_Outfile
+  cat "$Metaeffekt_Inv_Basedir/inventory-full.json" >> "$Metaeffekt_Inv_Outfile"
 
 elif [ "$1" == "--update" ]; then
   # generate new list of packages that were added since the last run
