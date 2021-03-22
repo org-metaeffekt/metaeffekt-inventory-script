@@ -78,7 +78,7 @@ command -v docker &>/dev/null && docker images --all --no-trunc --format '{"repo
 
 # collect os info
 osrelinfo=""
-if [ -f /etc/osrelease ]; then
+if [ -f /etc/os-release ]; then
   osprettyname="$(sed -n "s/\"//g;s/^PRETTY_NAME=//p" /etc/os-release)"
   oscpename="$(sed -n "s/\"//g;s/^CPE_NAME=//p" /etc/os-release)"
   osrelinfo="$(printf '"release":"%s","cpe":"%s"' "$osprettyname" "$oscpename" )"
