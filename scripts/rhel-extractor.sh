@@ -82,6 +82,8 @@ if [ -f /etc/os-release ]; then
   osprettyname="$(sed -n "s/\"//g;s/^PRETTY_NAME=//p" /etc/os-release)"
   oscpename="$(sed -n "s/\"//g;s/^CPE_NAME=//p" /etc/os-release)"
   osrelinfo="$(printf '"release":"%s","cpe":"%s"' "$osprettyname" "$oscpename" )"
+else
+  osrelinfo="$(printf '"release":null,"cpe":null')"
 fi
 
 unames="$(uname -s)"
