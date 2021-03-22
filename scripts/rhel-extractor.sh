@@ -110,7 +110,7 @@ if [ "$1" == "--full" ]; then
   timestamp="$(date -u --iso-8601=seconds)"
 
   # build host object
-  hostobj="$(printf '{"mtype":"host","machineidhash":"%s",%s,"time":"%s"}' "$machineidhash" "$cortag" "$timestamp")"
+  hostobj="$(printf '{"mtype":"host",%s,"machineidhash":"%s","time":"%s"}' "$cortag" "$machineidhash" "$timestamp")"
 
   # send host object
   printf "%s\n" "$hostobj" >> "$Metaeffekt_Inv_Outfile"
