@@ -64,6 +64,7 @@ machineidhash=$(cat /etc/machine-id | (echo -n "inventory-script" && cat - && ec
 # correlationid tag to be added to inventory messages (packages etc)
 cortag=$(printf '"correlationid":"%s"' "$correlationuuid")
 packagetag=$(printf '"mtype":"package",%s' "$cortag")
+osinfotag=$(printf '"mtype":"osinfo",%s' "$cortag")
 
 dockertag=$(printf '"mtype":"image","container":"docker",%s' "$cortag")
 
@@ -74,6 +75,22 @@ rpm -qa --qf "\{$packagetag," --qf '"name":"%{NAME}","version":"%{VERSION}","rel
 
 # if docker is installed, get data about docker images
 command -v docker &>/dev/null && docker images --all --no-trunc --format '{"repository":"{{.Repository}}","tag":"{{.Tag}}","imageid":"{{.ID}}","createdat":"{{.CreatedAt}}","size":"{{.Size}}"}' | sed "s/^{/{$dockertag,/g" >> "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
+
+# collect os info
+osrelinfo=""
+if [ -f /etc/osrelease ]; then
+  osprettyname="$(sed -n "s/\"//g;s/^PRETTY_NAME=//p" /etc/os-release)"
+  oscpename="$(sed -n "s/\"//g;s/^CPE_NAME=//p" /etc/os-release)"
+  osrelinfo="$(printf '"release":"%s","cpe":"%s"' "$osprettyname" )"
+fi
+
+unames="$(uname -s)"
+unamer="$(uname -r)"
+unamev="$(uname -v)"
+unamem="$(uname -m)"
+unameo="$(uname -o)"
+
+
 
 # sort everything
 sort -o "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json" "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
