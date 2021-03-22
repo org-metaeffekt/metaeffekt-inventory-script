@@ -90,7 +90,10 @@ unamev="$(uname -v)"
 unamem="$(uname -m)"
 unameo="$(uname -o)"
 
+unameall="$(printf '"unames":"%s","unamer":"%s","unamev":"%s","unamem":"%s","unameo":"%s"' "$unames" "$unamer" "$unamev" "$unamem" "$unameo")"
 
+# create osinfo object
+printf '{%s,%s,%s}' "$osinfotag" "$osrelinfo" "$unameall" >> "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
 
 # sort everything
 sort -o "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json" "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
