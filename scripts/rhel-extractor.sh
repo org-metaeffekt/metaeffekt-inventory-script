@@ -65,6 +65,7 @@ machineidhash="$(cat /etc/machine-id | (echo -n "inventory-script" && cat - && e
 cortag="$(printf '"correlationid":"%s"' "$correlationuuid")"
 packagetag="$(printf '"mtype":"package",%s' "$cortag")"
 osinfotag="$(printf '"mtype":"osinfo",%s' "$cortag")"
+processtag="$(printf '"mtype":"process",%s' "$cortag")"
 
 dockertag="$(printf '"mtype":"image","container":"docker",%s' "$cortag")"
 
@@ -100,6 +101,23 @@ unameall="$(printf '"unames":"%s","unamer":"%s","unamev":"%s","unamem":"%s","una
 
 # create osinfo object
 printf '{%s,%s,%s}' "$osinfotag" "$osrelinfo" "$unameall" >> "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
+
+# collect running processes
+# mind that ps output is not perfect
+psOutput="$(ps -A -o user:16= -o ruser:16= -o comm=)"
+psJson=""
+while IFS="" read -r line; do
+  psUser="${line:0:16}"
+  psUser="${psUser// /}"
+  psRuser="${line:17:16}"
+  psRuser="${psRuser// /}"
+  psComm="${line:34}"
+  psComm="$(sed 's/[\x08\x0C\x0A\x0D\x09\x22\x5C]//g' <<< "$psComm")"
+  psJson="$(printf '%s\n{%s,"user":"%s","ruser":"%s","comm":"%s"}' "$psJson" "$processtag" "$psUser" "$psRuser" "$psComm")"
+done <<< "$psOutput"
+
+#send output
+printf '%s\n' "$psJson" >> "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
 
 # sort everything
 sort -o "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json" "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
