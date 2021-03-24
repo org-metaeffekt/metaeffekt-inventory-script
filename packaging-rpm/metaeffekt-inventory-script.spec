@@ -17,6 +17,7 @@ Requires: bash
 Requires: coreutils
 Requires: cronie
 Requires: cronie-anacron
+Requires: procps-ng
 Requires: rpm
 Requires: sed
 Requires: util-linux
