@@ -9,6 +9,14 @@ rpmbuilddir="$scriptdir/rpmbuild"
 specname="metaeffekt-inventory-script.spec"
 packagename="metaeffekt-inventory-script"
 
+# check the current workdir. this is done to make sure the git archive and
+# git describe commands (in spec file) run correctly.
+# alternatively override the variables at the top of the script.
+if [ ! -f "$scriptdir/build-rpm.sh" ]; then
+  echo "error: current directory does not contain the build script."
+  echo "error: ensure you cd into the script's directory."
+fi
+
 # create rpmbuild directories
 mkdir -v "$scriptdir/rpmbuild"
 mkdir -v "$scriptdir/rpmbuild/BUILD"
