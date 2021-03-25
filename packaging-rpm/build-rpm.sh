@@ -3,7 +3,7 @@
 set -e
 
 # get locations and names
-scriptdir=$(pwd)
+scriptdir="$(pwd)"
 repodir="$scriptdir/../"
 rpmbuilddir="$scriptdir/rpmbuild"
 specname="metaeffekt-inventory-script.spec"
