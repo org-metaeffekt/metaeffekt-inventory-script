@@ -1,5 +1,5 @@
 Name: metaeffekt-inventory-script
-Version: %(git describe --tags | sed "s/-/+/;s/-/\./g")
+Version: %(git describe --tags --abbrev=16 | sed "s/-/./g")
 Release: 1%{?dist}
 Summary: Scripts for creating an inventory of software components on a machine.
 
