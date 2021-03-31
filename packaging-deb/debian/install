@@ -1,0 +1,3 @@
+scripts/debian-extractor.sh /opt/metaeffekt/inventory
+scripts/cronfiles/metaeffekt-inventory-debian-full /etc/cron.monthly
+scripts/cronfiles/metaeffekt-inventory-debian-update /etc/cron.daily

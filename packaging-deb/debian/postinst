@@ -1,0 +1,3 @@
+
+set -e
+bash /opt/metaeffekt/inventory/debian-extractor.sh --full

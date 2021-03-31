@@ -1,0 +1,13 @@
+Source: metaeffekt-inventory-script
+Section: unknown
+Priority: optional
+Maintainer: metaeffekt GmbH <contact@metaeffekt.com>
+Build-Depends: debhelper (>= 9)
+Standards-Version: 3.9.8
+Homepage: https://github.com/org-metaeffekt/metaeffekt-inventory-script
+
+Package: metaeffekt-inventory-script
+Architecture: all
+Depends: ${misc:Depends}, bash, uuid-runtime, anacron, dpkg, coreutils, sed, procps
+Description: Scripts for creating an inventory of software components on a machine.
+ Scripts for creating an inventory of software components on a machine.
