@@ -8,6 +8,6 @@ Homepage: https://github.com/org-metaeffekt/metaeffekt-inventory-script
 
 Package: metaeffekt-inventory-script
 Architecture: all
-Depends: ${misc:Depends}, bash, uuid-runtime, anacron, dpkg, coreutils, sed, procps
+Depends: ${misc:Depends}, uuid-runtime, anacron, sed, procps
 Description: Scripts for creating an inventory of software components on a machine.
  Scripts for creating an inventory of software components on a machine.
