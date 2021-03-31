@@ -1,5 +1,5 @@
 Source: metaeffekt-inventory-script
-Section: unknown
+Section: misc
 Priority: optional
 Maintainer: metaeffekt GmbH <contact@metaeffekt.com>
 Build-Depends: debhelper (>= 9)
