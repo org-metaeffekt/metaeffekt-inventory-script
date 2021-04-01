@@ -1,3 +1,3 @@
 
-rm -f /var/tmp/inventory/inventory-full.json
-rm -f /var/tmp/inventory/correlation-uuid
+rm -f /var/opt/metaeffekt/inventory/inventory-full.json
+rm -f /var/opt/metaeffekt/inventory/correlation-uuid

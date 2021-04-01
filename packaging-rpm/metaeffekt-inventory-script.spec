@@ -25,7 +25,7 @@ Requires: util-linux
 BuildArch: noarch
 
 %define metaeffekt_installdir /opt/metaeffekt/inventory
-%define metaeffekt_invdir /var/tmp/inventory
+%define metaeffekt_invdir /var/opt/metaeffekt/inventory
 
 %description
 

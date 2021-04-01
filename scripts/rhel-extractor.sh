@@ -23,7 +23,7 @@ set -e
 # -- variables --
 
 # the directory to store files in, both temporary and output files
-Metaeffekt_Inv_Basedir="/var/tmp/inventory"
+Metaeffekt_Inv_Basedir="/var/opt/metaeffekt/inventory"
 Metaeffekt_Inv_Outfile="$Metaeffekt_Inv_Basedir/inventory-out.json"
 
 # -- basic script stuff, check input etc
