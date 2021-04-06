@@ -41,6 +41,13 @@ mkdir -p "$Metaeffekt_Inv_Basedir"
 
 # -- prepare json tags --
 
+# check if uuid file exists
+if [ ! -f "$Metaeffekt_Inv_Basedir/correlation-uuid" ]; then
+  echo "UUID file missing. Running full instead of update."
+  # pretend that a full run was started
+  set -- "--full"
+fi
+
 # decide when to use a new correlation id or use old one
 correlationuuid="NONE"
 if [ "$1" == "--full" ]; then
@@ -49,9 +56,6 @@ if [ "$1" == "--full" ]; then
   uuidgen > "$Metaeffekt_Inv_Basedir/correlation-uuid"
   # update correlationuuid variable
   correlationuuid="$(cat "$Metaeffekt_Inv_Basedir/correlation-uuid")"
-elif [ ! -f "$Metaeffekt_Inv_Basedir/correlation-uuid" ]; then
-  echo "UUID file missing. Has full ever been run?"
-  exit 1
 else
   correlationuuid="$(cat "$Metaeffekt_Inv_Basedir/correlation-uuid")"
 fi
