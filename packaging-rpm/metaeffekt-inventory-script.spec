@@ -46,9 +46,6 @@ mkdir -p %{buildroot}/etc/cron.daily
 install -m 755 scripts/cronfiles/metaeffekt-inventory-rhel-full %{buildroot}/etc/cron.monthly/metaeffekt-inventory-rhel-full
 install -m 755 scripts/cronfiles/metaeffekt-inventory-rhel-update %{buildroot}/etc/cron.daily/metaeffekt-inventory-rhel-update
 
-%post
-%{metaeffekt_installdir}/rhel-extractor.sh --full
-
 %postun
 rm -f %{metaeffekt_invdir}/inventory-full.json
 rm -f %{metaeffekt_invdir}/correlation-uuid
