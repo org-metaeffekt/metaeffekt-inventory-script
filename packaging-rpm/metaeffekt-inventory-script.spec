@@ -15,7 +15,6 @@ BuildRequires: sed
 BuildRequires: tar
 Requires: bash
 Requires: coreutils
-Requires: cronie
 Requires: cronie-anacron
 Requires: procps-ng
 Requires: rpm
