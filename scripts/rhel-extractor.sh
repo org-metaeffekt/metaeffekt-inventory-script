@@ -43,7 +43,7 @@ mkdir -p "$Metaeffekt_Inv_Basedir"
 
 # check if uuid file exists
 if [ ! -f "$Metaeffekt_Inv_Basedir/correlation-uuid" ]; then
-  echo "UUID file missing. Running full instead of update."
+  echo "UUID file missing. Forcing full run."
   # pretend that a full run was started
   set -- "--full"
 fi
