@@ -18,11 +18,27 @@ With apt, use ./ at the beginning. Otherwise it may not recognize your deb file 
 
 The package itself does not require configurations to run.
 
-The output is made to be read by filebeat. A basic configuration for filebeat may look like this:
+The output is made to be read by filebeat.
+Processing scripts might expect well-formed json lines as input, therefore filebeat should be configured to put the script's data in its own separate index.
+
+A basic filebeat configuration may look like this:
 ```
+# Input
 - type: log
   enabled: true
   json.keys_under_root: false
+  close_renamed: true
+  close_removed: true
+  clean_removed: true
   paths:
     - /var/opt/metaeffekt/inventory/inventory-out.json
+  
+# Output
+output.elasticsearch:
+  host: ["IP"]
+  # ...
+  output.elasticsearch.index: "ae-inventory-%{[agent.version]}-%{+yyyy.MM.dd}"
+  setup.template.name: "ae-inventory"
+  setup.template.pattern: "ae-inventory-*"
+  setup.dashboards.index: "ae-inventory-*"
 ```
