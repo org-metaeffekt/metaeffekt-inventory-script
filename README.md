@@ -37,8 +37,5 @@ A basic filebeat configuration may look like this:
 output.elasticsearch:
   hosts: ["IP"]
   # ...
-  output.elasticsearch.index: "ae-inventory-%{[agent.version]}-%{+yyyy.MM.dd}"
-  setup.template.name: "ae-inventory"
-  setup.template.pattern: "ae-inventory-*"
-  setup.dashboards.index: "ae-inventory-*"
+  index: "ae-inventory-%{[agent.version]}-%{+yyyy.MM.dd}"
 ```
