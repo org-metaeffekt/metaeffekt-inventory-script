@@ -25,6 +25,7 @@ A basic filebeat configuration may look like this:
 ```
 # Input
 - type: log
+  index: "ae-inventory-%{[agent.version]}-%{+yyyy.MM.dd}"
   enabled: true
   json.keys_under_root: false
   close_renamed: true
@@ -32,10 +33,10 @@ A basic filebeat configuration may look like this:
   clean_removed: true
   paths:
     - /var/opt/metaeffekt/inventory/inventory-out.json
-  
-# Output
-output.elasticsearch:
-  hosts: ["IP"]
-  # ...
-  index: "ae-inventory-%{[agent.version]}-%{+yyyy.MM.dd}"
+
+# If this is the only input and ilm isn't used, uncomment
+# this line to disable ilm. If ilm is enabled, an extra
+# empty index will be automatically created since the
+# input's index override is not effective for setup.
+#setup.ilm.enabled: false
 ```
