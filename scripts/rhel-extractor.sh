@@ -138,11 +138,11 @@ if [ "$1" == "--full" ]; then
   # build host object
   hostobj="$(printf '{"mtype":"host",%s,"machineidhash":"%s","time":"%s"}' "$cortag" "$machineidhash" "$timestamp")"
 
-  # send host object
-  printf "%s\n" "$hostobj" >> "$Metaeffekt_Inv_Outfile"
-
   # send full list
   cat "$Metaeffekt_Inv_Basedir/inventory-full.json" >> "$Metaeffekt_Inv_Outfile"
+
+  # send host object
+  printf "%s\n" "$hostobj" >> "$Metaeffekt_Inv_Outfile"
 
 elif [ "$1" == "--update" ]; then
   # generate new list of packages that were added since the last run
