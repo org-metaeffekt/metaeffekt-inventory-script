@@ -104,7 +104,7 @@ unameo="$(uname -o)"
 unameall="$(printf '"unames":"%s","unamer":"%s","unamev":"%s","unamem":"%s","unameo":"%s"' "$unames" "$unamer" "$unamev" "$unamem" "$unameo")"
 
 # create osinfo object
-printf '{%s,%s,%s}' "$osinfotag" "$osrelinfo" "$unameall" >> "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
+printf '{%s,%s,%s}\n' "$osinfotag" "$osrelinfo" "$unameall" >> "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
 
 # collect running processes
 # mind that ps output is not perfect
@@ -119,6 +119,9 @@ while IFS="" read -r line; do
   psComm="$(sed 's/[\x08\x0C\x0A\x0D\x09\x22\x5C]//g' <<< "$psComm")"
   psJson="$(printf '%s\n{%s,"user":"%s","ruser":"%s","comm":"%s"}' "$psJson" "$processtag" "$psUser" "$psRuser" "$psComm")"
 done <<< "$psOutput"
+
+# remove first unneeded newline
+psJson="${psJson:1}"
 
 #send output
 printf '%s\n' "$psJson" >> "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
