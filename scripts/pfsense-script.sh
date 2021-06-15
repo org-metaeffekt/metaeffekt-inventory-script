@@ -77,7 +77,7 @@ dockertag="$(printf '"mtype":"image","container":"docker",%s' "$cortag")"
 # -- collect relevant data --
 
 # generate a json file containing all packages currently installed into a new temporary full state file
-pkg info --all -R --raw-format json | jq -c '{name,version,release,arch,group,license,licenselogic,licenses,sourcepackage,"packager":.maintainer,vendor,"url":.www}' > "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
+pkg info --all --full -R --raw-format json | jq -c '{name,version,release,arch,group,license,licenselogic,licenses,sourcepackage,"packager":.maintainer,vendor,"url":.www}' > "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
 
 # if docker is installed, get data about docker images
 command -v docker &>/dev/null && docker images --all --no-trunc --format '{"repository":"{{.Repository}}","tag":"{{.Tag}}","imageid":"{{.ID}}","createdat":"{{.CreatedAt}}","size":"{{.Size}}"}' | sed "s/^{/{$dockertag,/g" >> "$Metaeffekt_Inv_Basedir/inventory-full.tmp.json"
@@ -85,10 +85,8 @@ command -v docker &>/dev/null && docker images --all --no-trunc --format '{"repo
 # collect os info
 # os release file does not always exist on pfsense. use uname only.
 osrelinfo=""
-#osprettyname="$(sed -n "s/\"//g;s/^PRETTY_NAME=//p" /etc/os-release)"
-#oscpename="$(sed -n "s/\"//g;s/^CPE_NAME=//p" /etc/os-release)"
-#osrelinfo="$(printf '"release":"%s","cpe":"%s"' "$osprettyname" "$oscpename" )"
-osrelinfo="$(printf '"release":null,"cpe":null')"
+pfSenseVersion="$(cat /etc/version)"
+osrelinfo="$(printf '"release":"%s","cpe":null' "$pfSenseVersion")"
 
 unames="$(uname -s)"
 unamer="$(uname -r)"
