@@ -30,11 +30,48 @@ Metaeffekt_Inv_Outfile="$Metaeffekt_Inv_Basedir/inventory-out.json"
 
 echo "Executing $0"
 
-# check the input flag
-if [ "$1" != "--update" ] && [ "$1" != "--full" ]; then
-    echo "$0: Invalid flag."
+# check the input flags
+
+OPTINT=1
+OPTSPEC="t-:"
+
+# mode to run in for inventory script
+modeflag=""
+machineTag=""
+
+while getopts "${OPTSPEC}" fopt ; do
+  #echo "DEBUG: $fopt . $OPTARG"
+  case "${fopt}" in
+    -)
+      case "${OPTARG}" in
+        full)
+          modeflag="full"
+          ;;
+        update)
+          modeflag="update"
+          ;;
+        *)
+          echo "Invalid option --${OPTARG}"
+          exit 1
+          ;;
+      esac
+      ;;
+    t)
+      machineTag="${OPTARG}"
+      ;;
+    ?)
+      exit 1
+      ;;
+  esac
+done
+
+if [ "$modeflag" = "" ]; then
+    echo "$0: Missing flag."
     exit 1
 fi
+
+# hack to make the old positional argument work with the new argument input
+set -- "--$modeflag"
 
 # create folder structure in analysis folder (assuming sufficient permissions)
 mkdir -p "$Metaeffekt_Inv_Basedir"
