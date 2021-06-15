@@ -37,7 +37,7 @@ tar -xf %{_sourcedir}/metaeffekt-inventory-script-src.tar.gz
 mkdir -p %{buildroot}/%{metaeffekt_installdir}
 
 
-install -m 755 scripts/rhel-extractor.sh %{buildroot}/%{metaeffekt_installdir}/rhel-extractor.sh
+install -m 755 scripts/rhel-inventory.sh %{buildroot}/%{metaeffekt_installdir}/rhel-inventory.sh
 
 # need to create cron dummy dirs
 mkdir -p %{buildroot}/etc/cron.monthly
@@ -51,7 +51,7 @@ rm -f %{metaeffekt_invdir}/correlation-uuid
 
 %files
 %license LICENSE
-%{metaeffekt_installdir}/rhel-extractor.sh
+%{metaeffekt_installdir}/rhel-inventory.sh
 /etc/cron.monthly/metaeffekt-inventory-rhel-full
 /etc/cron.daily/metaeffekt-inventory-rhel-update
 
