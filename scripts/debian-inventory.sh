@@ -33,7 +33,7 @@ echo "Executing $0"
 # check the input flags
 
 OPTINT=1
-OPTSPEC="t-:"
+OPTSPEC="t:-:"
 
 # mode to run in for inventory script
 modeflag=""
