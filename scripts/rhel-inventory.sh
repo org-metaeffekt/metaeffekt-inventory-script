@@ -59,7 +59,8 @@ while getopts "${OPTSPEC}" fopt ; do
     t)
       # set, at runtime, a custom machineTag for identification.
       # this is sent in the host object with every "full" run
-      machineTag="${OPTARG}"
+      # should only contain the base64 characters and - and _
+      machineTag="${OPTARG//[^a-zA-Z0-9_\-\/+]/}"
       ;;
     ?)
       exit 1
