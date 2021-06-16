@@ -16,7 +16,7 @@ With apt, use ./ at the beginning. Otherwise it may not recognize your deb file 
 
 ## Configuration
 
-The package itself does not require configurations to run.
+The package itself does not require special configuration to run. It does take parameters from the command line though.
 
 The output is made to be read by filebeat.
 Processing scripts might expect well-formed json lines as input, therefore filebeat should be configured to put the script's data in its own separate index.
@@ -40,3 +40,15 @@ A basic filebeat configuration may look like this:
 # input's index override is not effective for setup.
 #setup.ilm.enabled: false
 ```
+
+## Running the Scripts
+
+To run the scripts, execute the shell script for your particular operating system with appropriate parameters.
+
+The scripts require at least one parameter to run: Either "--full" or "--update" to
+decide whether to output all available system information or just output changes.
+
+Other possible arguments are:
+ - \-t \<machineTag\> : Adds a tag to sent host objects when running with "--full".
+   This exists so that a custom Identifier can be set.
+   It should consist of only base64 (alphanumeric plus . and /) characters.
