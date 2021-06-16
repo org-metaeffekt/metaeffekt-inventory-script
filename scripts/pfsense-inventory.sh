@@ -159,7 +159,7 @@ if [ "$1" == "--full" ]; then
   timestamp="$(date -Iseconds)"
 
   # build host object
-  hostobj="$(printf '{"mtype":"host",%s,"machineidhash":"%s","time":"%s"}' "$cortag" "$machineidhash" "$timestamp")"
+  hostobj="$(printf '{"mtype":"host",%s,"machineidhash":"%s","time":"%s","machinetag":"%s"}' "$cortag" "$machineidhash" "$timestamp" "$machineTag")"
 
   # send full list
   cat "$Metaeffekt_Inv_Basedir/inventory-full.json" >> "$Metaeffekt_Inv_Outfile"
