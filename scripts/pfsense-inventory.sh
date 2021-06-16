@@ -57,6 +57,8 @@ while getopts "${OPTSPEC}" fopt ; do
       esac
       ;;
     t)
+      # set, at runtime, a custom machineTag for identification.
+      # this is sent in the host object with every "full" run
       machineTag="${OPTARG}"
       ;;
     ?)
