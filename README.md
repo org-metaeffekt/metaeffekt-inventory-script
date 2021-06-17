@@ -2,6 +2,19 @@
 
 Scripts for creating an inventory of software components on a machine.
 
+The scripts are primarily intended to be used in production environment and 
+run with minimal resource consumption profile.
+
+The script produces outputs in ``/var/opt/metaeffekt/inventory``. These can
+be forwarded (e.g. using file beat or other means) for aggregation and 
+further analysis.
+
+![Alt](doc/overview.png)
+
+The figure illustrates how the script can be applied in a staged environment.
+
+For aggregating in-depth ost analysis data in a non-production environment
+use the {metæffekt} extraction script.
 
 ## Installation
 
@@ -51,4 +64,5 @@ decide whether to output all available system information or just output changes
 Other possible arguments are:
  - \-t \<machineTag\> : Adds a tag to sent host objects when running with "--full".
    This exists so that a custom Identifier can be set.
-   It should consist of only base64 (alphanumeric plus . and /) characters.
+   It should consist only of characters as allowed for base64 encoded strings
+   (alphanumeric plus . and /).
